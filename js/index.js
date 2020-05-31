@@ -4,7 +4,7 @@ let tones = {};
 colorOptions.forEach(function(c,i){
   tones[c] = 400+i*40;
 });
-let osc_type = "square";
+let osc_type = "triangle";
 
 //setup an event listener for the start button that will set up a game loop
 document.getElementById("reset").onclick = start;
@@ -115,7 +115,6 @@ function listeningBeep(){
 
 function successBeep(time){
   var b = beepStart(700+time*40);
-
   setTimeout(function(){
     beepEnd(b);
     if (time < 4){
@@ -126,7 +125,6 @@ function successBeep(time){
 
 function gameoverBeep(time){
   var b = beepStart(700-time*40);
-
   setTimeout(function(){
     beepEnd(b);
     if (time < 4){
