@@ -1,13 +1,10 @@
 let pattern = [];
-let colorOptions = ["red", "yellow", "blue", "green"]
-let tones = {
-  red: 400,
-  yellow: 440,
-  blue: 480,
-  green: 520
-}
-
-let state = "showing";
+let colorOptions = ["red", "yellow", "blue", "green"];
+let tones = {};
+colorOptions.forEach(function(c,i){
+  tones[c] = 400+i*40;
+});
+let osc_type = "square";
 
 //setup an event listener for the start button that will set up a game loop
 document.getElementById("reset").onclick = start;
@@ -15,12 +12,11 @@ document.getElementById("reset").onclick = start;
 function start(){
   pattern = [];
   pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)]);
-  state = "showing";
   document.getElementById("gameover").style.display = "none";
-  loop();
+  loop("showing");
 }
 
-function loop(){
+function loop(state){
   document.querySelectorAll(".button").forEach(function(b){
     b.onclick = null;
   });
@@ -31,28 +27,19 @@ function loop(){
     listeningBeep();
     listen(0);
   } else if (state == "gameover") {
-    gameoverBeep(0)
+    gameoverBeep(0);
     gameover();
   }
 }
 
 function show(currentColor){
   if (currentColor < pattern.length){
-    flash(
-      pattern[currentColor],
-      500,
-      function(){
-        show(++currentColor);
-      }
-    )
+    flash(pattern[currentColor],500,function(){ show(++currentColor) })
   } else{
-    state = "listening"
-    loop();
+    loop("listening");
   }
-
 }
 
-// this makes one button brighter for a half second and then call whatever function was passed to it
 function flash(color, time, increment){
   document.getElementById(color).classList.add("flash");
   var b = beepStart(tones[color]);
@@ -67,42 +54,39 @@ function flash(color, time, increment){
 }
 
 function listen(currentColor){
-  console.log("listen",currentColor, pattern[currentColor]);
   if (currentColor >= pattern.length){
     successBeep(0);
-    pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)])
-    state = "showing"
-    setTimeout(loop, 1000);
+    pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)]);
+    setTimeout(function(){loop("showing")}, 1000);
   } else {
-    // start a listen timer for the first button
     var timeout = setTimeout(function(){
       // if timer expires game over
-      state = "gameover";
-      loop();
+      loop("gameover");
     },2000);
 
     document.querySelectorAll(".button").forEach(function(b){
       b.onclick = function(e){
         clearTimeout(timeout);
         var color = e.target.id;
-        flash(color, 200, function(){
-          if (color == pattern[currentColor]){
+        flash(color,200,
+          function(){
+            if (color == pattern[currentColor]){
               listen(++currentColor);
-          } else {
-            state = "gameover";
-            loop();
+            } else {
+              loop("gameover");
+            }
           }
-        });
+        );
       }
     })
   }
 }
 
 function beepStart(freq){
-  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
+  var ctxClass = window.audioContext || window.AudioContext || window.AudioContext || window.webkitAudioContext;
   var ctx = new ctxClass();
   var osc = ctx.createOscillator();
-  osc.type = "sine"
+  osc.type = osc_type;
   osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
   osc.connect(ctx.destination);
@@ -118,11 +102,9 @@ function beepEnd(osc){
 }
 
 function gameover(){
-  console.log("gameover");
   document.getElementById("gameover").style.display = "block";
   document.getElementById("score").innerHTML = pattern.length-1;
 }
-
 
 function listeningBeep(){
   var b = beepStart(600);
@@ -140,7 +122,6 @@ function successBeep(time){
       successBeep(++time);
     }
   },100);
-
 }
 
 function gameoverBeep(time){
@@ -157,6 +138,6 @@ function gameoverBeep(time){
 // Ideas:
 // add more than one color in later rounds
 // Shorten timer
-// Have to more than primary colors
+// Have more than four colors
 // Visual distraction
-// Play a sound for each
+// game settings menu
