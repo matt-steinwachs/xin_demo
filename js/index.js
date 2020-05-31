@@ -2,49 +2,86 @@ let pattern = [];
 let colorOptions = ["red", "yellow", "blue", "green"]
 let state = "showing";
 
-//Add random first color
-pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)])
-
 //setup an event listener for the start button that will set up a game loop
-document.getElementById("reset").onclick = loop;
+document.getElementById("reset").onclick = start;
+
+function start(){
+  pattern = [];
+  pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)]);
+  state = "showing";
+  document.getElementById("gameover").style.display = "none";
+  document.getElementById("score").style.display = "none";
+  loop();
+}
 
 function loop(){
-  //steps in the loop:
-  // adds a color to the patter
-  // show the pattern
-  // listen for the user to click each color in the pattern within a time limit
-  // if any mistakes are made, end the game and show a score
-  // else repeat
-
   if (state == "showing"){
-    //flash the squares in order
+    show();
   } else if (state == "listening") {
-    //listen for the next button press
+    listen(0);
+  } else if (state == "gameover") {
+    gameover();
   }
 }
 
 function show(){
   let currentColor = 0;
   let timer = setInterval(function(){
-    flash(pattern[currentColor], function(){currentColor++;})
+    if (currentColor < pattern.length){
+      flash(pattern[currentColor], function(){currentColor++;})
+    } else{
+      clearTimeout(timer);
+      state = "listening"
+      loop();
+    }
   }, 2000)
 }
 
+// this makes one button brighter for a half second and then call whatever function was passed to it
 function flash(color, increment){
-
+  document.getElementById(color).classList.add("flash");
+  setTimeout(function(){
+    document.getElementById(color).classList.remove("flash");
+    if (increment !== undefined){
+      increment();
+    }
+  },1000);
 }
 
-function listen(){
-  // start a listen timer for the first button
+function listen(currentColor){
+  if (currentColor >= pattern.length){
+    pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)])
+    state = "showing"
+    loop();
+  } else {
+    // start a listen timer for the first button
+    var timeout = setTimeout(function(){
+      // if timer expires game over
+      state = "gameover";
+      loop();
+    },2000);
 
-  // if timer expires game over
+    document.querySelectorAll(".button").forEach(function(b){
+      b.onclick = function(e){
+        clearTimeout(timeout);
+        var color = e.target.id;
+        flash(color);
+        if (color == pattern[currentColor]){
+            listen(++currentColor);
+        } else {
+          state = "gameover";
+          loop();
+        }
+      }
+    })
+  }
+}
 
-  // on each button click check if correct color in patter
-
-  // if not game over
-
-  // if it is then restart listen timer
-    // or if we're at the end of the pattern add a new color
+function gameover(){
+  console.log("gameover");
+  document.getElementById("gameover").style.display = "block";
+  document.getElementById("score").innerHTML = pattern.length;
+  document.getElementById("score").style.display = "block";
 }
 
 // Ideas:

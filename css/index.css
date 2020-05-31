@@ -1,3 +1,8 @@
+
+.simon .btn {
+  padding-top: 15px;
+}
+
 .buttonGrid {
   height: 604px;
   width: 604px;
@@ -8,21 +13,34 @@
   width: 300px;
   height: 300px;
   margin: -2px;
+  cursor: pointer;
 }
 
 #red{
+  background-color: darkred;
+}
+#red.flash{
   background-color: red;
 }
 
 #blue{
+  background-color: darkblue;
+}
+#blue.flash{
   background-color: blue;
 }
 
 #yellow{
+  background-color: goldenrod;
+}
+#yellow.flash{
   background-color: yellow;
 }
 
 #green{
+  background-color: darkgreen;
+}
+#green.flash{
   background-color: green;
 }
 
@@ -31,4 +49,17 @@
   height: 30px;
   width: 75px;
   color: white;
+  cursor: pointer;
+}
+
+#gameover {
+  display: none;
+  position: absolute;
+  top: 267px;
+  left: 200px;
+  background-color: white;
+}
+
+#score {
+  display:none;
 }
