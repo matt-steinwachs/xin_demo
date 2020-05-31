@@ -6,6 +6,7 @@
 .buttonGrid {
   height: 604px;
   width: 604px;
+  position: relative;
 }
 
 .button{
@@ -46,10 +47,10 @@
 
 #reset{
   background-color: black;
-  height: 30px;
-  width: 75px;
   color: white;
   cursor: pointer;
+  padding: 5px;
+  text-align: center;
 }
 
 #gameover {
