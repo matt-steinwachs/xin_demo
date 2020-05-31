@@ -55,21 +55,11 @@ function show(currentColor){
 // this makes one button brighter for a half second and then call whatever function was passed to it
 function flash(color, time, increment){
   document.getElementById(color).classList.add("flash");
-
-  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
-  var ctx = new ctxClass();
-  var osc = ctx.createOscillator();
-  osc.type = "sine"
-  osc.frequency.setValueAtTime(tones[color], ctx.currentTime);
-
-  osc.connect(ctx.destination);
-  if (osc.noteOn) osc.noteOn(0); // old browsers
-  if (osc.start) osc.start(); // new browsers
+  var b = beepStart(tones[color]);
 
   setTimeout(function(){
     document.getElementById(color).classList.remove("flash");
-    if (osc.noteOff) osc.noteOff(0); // old browsers
-    if (osc.stop) osc.stop(); // new browsers
+    beepEnd(b);
     if (increment !== undefined){
       setTimeout(increment, time);
     }
@@ -108,6 +98,25 @@ function listen(currentColor){
   }
 }
 
+function beepStart(freq){
+  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
+  var ctx = new ctxClass();
+  var osc = ctx.createOscillator();
+  osc.type = "sine"
+  osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+  osc.connect(ctx.destination);
+  if (osc.noteOn) osc.noteOn(0); // old browsers
+  if (osc.start) osc.start(); // new browsers
+
+  return osc;
+}
+
+function beepEnd(osc){
+  if (osc.noteOff) osc.noteOff(0); // old browsers
+  if (osc.stop) osc.stop(); // new browsers
+}
+
 function gameover(){
   console.log("gameover");
   document.getElementById("gameover").style.display = "block";
@@ -116,36 +125,17 @@ function gameover(){
 
 
 function listeningBeep(){
-  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
-  var ctx = new ctxClass();
-  var osc = ctx.createOscillator();
-  osc.type = "sine"
-  osc.frequency.setValueAtTime(600, ctx.currentTime);
-
-  osc.connect(ctx.destination);
-  if (osc.noteOn) osc.noteOn(0); // old browsers
-  if (osc.start) osc.start(); // new browsers
-
+  var b = beepStart(600);
   setTimeout(function(){
-    if (osc.noteOff) osc.noteOff(0); // old browsers
-    if (osc.stop) osc.stop(); // new browsers
+    beepEnd(b);
   },100);
 }
 
 function successBeep(time){
-  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
-  var ctx = new ctxClass();
-  var osc = ctx.createOscillator();
-  osc.type = "sine"
-  osc.frequency.setValueAtTime(700+time*40, ctx.currentTime);
-
-  osc.connect(ctx.destination);
-  if (osc.noteOn) osc.noteOn(0); // old browsers
-  if (osc.start) osc.start(); // new browsers
+  var b = beepStart(700+time*40);
 
   setTimeout(function(){
-    if (osc.noteOff) osc.noteOff(0); // old browsers
-    if (osc.stop) osc.stop(); // new browsers
+    beepEnd(b);
     if (time < 4){
       successBeep(++time);
     }
@@ -154,24 +144,14 @@ function successBeep(time){
 }
 
 function gameoverBeep(time){
-  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
-  var ctx = new ctxClass();
-  var osc = ctx.createOscillator();
-  osc.type = "sine"
-  osc.frequency.setValueAtTime(700-time*40, ctx.currentTime);
-
-  osc.connect(ctx.destination);
-  if (osc.noteOn) osc.noteOn(0); // old browsers
-  if (osc.start) osc.start(); // new browsers
+  var b = beepStart(700-time*40);
 
   setTimeout(function(){
-    if (osc.noteOff) osc.noteOff(0); // old browsers
-    if (osc.stop) osc.stop(); // new browsers
+    beepEnd(b);
     if (time < 4){
       gameoverBeep(++time);
     }
   },100);
-
 }
 
 // Ideas:
