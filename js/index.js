@@ -40,7 +40,7 @@ function show(currentColor){
   if (currentColor < pattern.length){
     flash(
       pattern[currentColor],
-      1000,
+      500,
       function(){
         show(++currentColor);
       }
