@@ -55,11 +55,8 @@
 #gameover {
   display: none;
   position: absolute;
-  top: 267px;
+  top: 230px;
   left: 200px;
   background-color: white;
-}
-
-#score {
-  display:none;
+  padding: 10px;
 }

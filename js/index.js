@@ -1,5 +1,12 @@
 let pattern = [];
 let colorOptions = ["red", "yellow", "blue", "green"]
+let tones = {
+  red: 400,
+  yellow: 440,
+  blue: 480,
+  green: 520
+}
+
 let state = "showing";
 
 //setup an event listener for the start button that will set up a game loop
@@ -10,49 +17,72 @@ function start(){
   pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)]);
   state = "showing";
   document.getElementById("gameover").style.display = "none";
-  document.getElementById("score").style.display = "none";
   loop();
 }
 
 function loop(){
+  document.querySelectorAll(".button").forEach(function(b){
+    b.onclick = null;
+  });
+
   if (state == "showing"){
-    show();
+    show(0);
   } else if (state == "listening") {
+    listeningBeep();
     listen(0);
   } else if (state == "gameover") {
+    gameoverBeep(0)
     gameover();
   }
 }
 
-function show(){
-  let currentColor = 0;
-  let timer = setInterval(function(){
-    if (currentColor < pattern.length){
-      flash(pattern[currentColor], function(){currentColor++;})
-    } else{
-      clearTimeout(timer);
-      state = "listening"
-      loop();
-    }
-  }, 2000)
+function show(currentColor){
+  if (currentColor < pattern.length){
+    flash(
+      pattern[currentColor],
+      1000,
+      function(){
+        show(++currentColor);
+      }
+    )
+  } else{
+    state = "listening"
+    loop();
+  }
+
 }
 
 // this makes one button brighter for a half second and then call whatever function was passed to it
-function flash(color, increment){
+function flash(color, time, increment){
   document.getElementById(color).classList.add("flash");
+
+  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
+  var ctx = new ctxClass();
+  var osc = ctx.createOscillator();
+  osc.type = "sine"
+  osc.frequency.setValueAtTime(tones[color], ctx.currentTime);
+
+  osc.connect(ctx.destination);
+  if (osc.noteOn) osc.noteOn(0); // old browsers
+  if (osc.start) osc.start(); // new browsers
+
   setTimeout(function(){
     document.getElementById(color).classList.remove("flash");
+    if (osc.noteOff) osc.noteOff(0); // old browsers
+    if (osc.stop) osc.stop(); // new browsers
     if (increment !== undefined){
-      increment();
+      setTimeout(increment, time);
     }
-  },1000);
+  },time);
 }
 
 function listen(currentColor){
+  console.log("listen",currentColor, pattern[currentColor]);
   if (currentColor >= pattern.length){
+    successBeep(0);
     pattern.push(colorOptions[Math.floor(Math.random() * colorOptions.length)])
     state = "showing"
-    loop();
+    setTimeout(loop, 1000);
   } else {
     // start a listen timer for the first button
     var timeout = setTimeout(function(){
@@ -65,13 +95,14 @@ function listen(currentColor){
       b.onclick = function(e){
         clearTimeout(timeout);
         var color = e.target.id;
-        flash(color);
-        if (color == pattern[currentColor]){
-            listen(++currentColor);
-        } else {
-          state = "gameover";
-          loop();
-        }
+        flash(color, 200, function(){
+          if (color == pattern[currentColor]){
+              listen(++currentColor);
+          } else {
+            state = "gameover";
+            loop();
+          }
+        });
       }
     })
   }
@@ -81,7 +112,66 @@ function gameover(){
   console.log("gameover");
   document.getElementById("gameover").style.display = "block";
   document.getElementById("score").innerHTML = pattern.length;
-  document.getElementById("score").style.display = "block";
+}
+
+
+function listeningBeep(){
+  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
+  var ctx = new ctxClass();
+  var osc = ctx.createOscillator();
+  osc.type = "sine"
+  osc.frequency.setValueAtTime(600, ctx.currentTime);
+
+  osc.connect(ctx.destination);
+  if (osc.noteOn) osc.noteOn(0); // old browsers
+  if (osc.start) osc.start(); // new browsers
+
+  setTimeout(function(){
+    if (osc.noteOff) osc.noteOff(0); // old browsers
+    if (osc.stop) osc.stop(); // new browsers
+  },100);
+}
+
+function successBeep(time){
+  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
+  var ctx = new ctxClass();
+  var osc = ctx.createOscillator();
+  osc.type = "sine"
+  osc.frequency.setValueAtTime(700+time*40, ctx.currentTime);
+
+  osc.connect(ctx.destination);
+  if (osc.noteOn) osc.noteOn(0); // old browsers
+  if (osc.start) osc.start(); // new browsers
+
+  setTimeout(function(){
+    if (osc.noteOff) osc.noteOff(0); // old browsers
+    if (osc.stop) osc.stop(); // new browsers
+    if (time < 4){
+      successBeep(++time);
+    }
+  },100);
+
+}
+
+function gameoverBeep(time){
+  var ctxClass = window.audioContext ||window.AudioContext || window.AudioContext || window.webkitAudioContext
+  var ctx = new ctxClass();
+  var osc = ctx.createOscillator();
+  osc.type = "sine"
+  osc.frequency.setValueAtTime(700-time*40, ctx.currentTime);
+
+  osc.connect(ctx.destination);
+  if (osc.noteOn) osc.noteOn(0); // old browsers
+  if (osc.start) osc.start(); // new browsers
+
+  setTimeout(function(){
+    if (osc.noteOff) osc.noteOff(0); // old browsers
+    if (osc.stop) osc.stop(); // new browsers
+    if (time < 4){
+      gameoverBeep(++time);
+    }
+  },100);
+
 }
 
 // Ideas:
