@@ -111,7 +111,7 @@ function listen(currentColor){
 function gameover(){
   console.log("gameover");
   document.getElementById("gameover").style.display = "block";
-  document.getElementById("score").innerHTML = pattern.length;
+  document.getElementById("score").innerHTML = pattern.length-1;
 }
 
 
