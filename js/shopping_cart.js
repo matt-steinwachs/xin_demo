@@ -43,40 +43,37 @@ function renderCartItem(item){
 function renderTotal(items){
   let total = 0;
 
-  // loops here to calculate total
-
-  let i = 0;
-  while(i < cart.length){
-    total += items[i].price*items[i].quantity
-    i++;
-  }
-
-  // for (let i = 0; i < items.length; i++){
+  // three equivalent loops to calculate a cart total
+  // let i = 0;
+  // while(i < cart.length){
   //   total += items[i].price*items[i].quantity
+  //   i++;
   // }
 
-  // items.forEach(item => {
-  //   total += item.price * item.quantity
-  // });
+  // for (let i = 0; i < items.length; i++){
+  //   total += items[i].price*items[i].quantity;
+  // }
+
+  items.forEach(item => {
+    total += item.price * item.quantity
+  });
 
   document.getElementById("total").innerHTML = "$"+total;
 }
 
-// loops here to render each cart item
+// three equivalent loops to render all cart items
 // https://computersciencewiki.org/index.php/Loops
 // https://www.w3schools.com/js/js_loop_for.asp
 
-let i = 0;
-while(i < cart.length){
-  renderCartItem(cart[i]);
-  i++;
-}
+// let i = 0;
+// while(i < cart.length){
+//   renderCartItem(cart[i]);
+//   i++;
+// }
 
 // for (let i = 0; i < cart.length; i++){
 //   renderCartItem(cart[i]);
 // }
 
-// cart.forEach(renderCartItem);
-
-
+cart.forEach(renderCartItem);
 renderTotal(cart);
